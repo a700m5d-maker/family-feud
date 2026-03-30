@@ -3,522 +3,159 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>فاملي فيود</title>
+<title>فاملي فيود - النسخة المطورة</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* نفس التنسيقات الرائعة التي أرفقتها مع تحسينات بسيطة */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#FFD700;--navy:#07122E;--navy-mid:#0E1F50;--navy-card:#0D1E55;--red:#FF2222;--green:#44CC44;--white:#FFF;--muted:#7AA4E8}
+html,body{width:100%;height:100%;background:var(--navy);font-family:'Cairo',sans-serif;color:var(--white);overflow:hidden}
+#app{position:relative;z-index:1;width:100vw;height:100vh}
+.hidden{display:none!important}
+.screen{width:100%;height:100%;display:flex;flex-direction:column}
 
-  :root {
-    --gold: #FFD700;
-    --gold-dark: #C8A800;
-    --navy: #0A1E4A;
-    --navy-mid: #122460;
-    --navy-light: #1A3A8A;
-    --navy-card: #0D2258;
-    --red: #CC1111;
-    --red-bright: #FF2222;
-    --green-win: #1A8A1A;
-    --white: #FFFFFF;
-    --text-muted: #7AA4E8;
-  }
+/* LANDING */
+#landing{align-items:center;justify-content:center;gap:3vh;padding:4vw}
+.land-title{font-size:min(10vw,90px);font-weight:900;color:var(--gold);text-shadow:0 0 60px #FFD70055;text-align:center}
+.land-cards{display:flex;gap:2vw;flex-wrap:wrap;justify-content:center;width:100%;max-width:860px}
+.land-card{flex:1;min-width:240px;background:var(--navy-card);border:1.5px solid #2A4A9A;border-radius:1.5vw;padding:3vh 3vw;cursor:pointer;transition:0.2s;text-align:center}
+.land-card:hover{border-color:var(--gold);transform:translateY(-4px)}
 
-  html, body {
-    width: 100%; height: 100%;
-    background: var(--navy);
-    font-family: 'Cairo', sans-serif;
-    color: var(--white);
-    overflow: hidden;
-    user-select: none;
-  }
+/* SCOREBOARD & GAME UI */
+.scoreboard{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:1.5vw;background:var(--navy-mid);border:1.5px solid #2A4A9A;border-radius:1vw;padding:1.2vh 2vw}
+.t-score{font-size:min(5.5vw,54px);font-weight:900}
+.active .t-score{color:var(--gold);text-shadow:0 0 20px #FFD70055}
+.ans-grid{display:grid;grid-template-columns:1fr 1fr;gap:1vw;padding:1vw}
+.ans-card{background:var(--navy-card);border:1.5px solid #2A4A9A;border-radius:.8vw;display:flex;align-items:center;padding:1vh 1.5vw;min-height:60px}
+.ans-card.rev{background:#061840;border-color:var(--gold)}
 
-  /* ─── BACKGROUND PATTERN ─── */
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background:
-      radial-gradient(ellipse 80% 50% at 50% 0%, #1A3A8A44 0%, transparent 70%),
-      radial-gradient(ellipse 60% 40% at 50% 100%, #0A1E4A88 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  #app { position: relative; z-index: 1; width: 100vw; height: 100vh; display: flex; flex-direction: column; }
-
-  /* ─── SETUP SCREEN ─── */
-  #setup-screen {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    height: 100%; gap: 2vw; padding: 4vw;
-  }
-
-  .setup-title {
-    font-size: 8vw; font-weight: 900; color: var(--gold);
-    text-shadow: 0 0 40px #FFD70066;
-    letter-spacing: 0.05em;
-    line-height: 1;
-  }
-  .setup-sub { font-size: 2.2vw; color: var(--text-muted); margin-top: -1vw; }
-
-  .setup-card {
-    background: var(--navy-card);
-    border: 1.5px solid #2A4A9A;
-    border-radius: 1.5vw;
-    padding: 2.5vw 3.5vw;
-    width: 55vw;
-  }
-  .setup-card-title { font-size: 1.6vw; color: var(--text-muted); margin-bottom: 1.5vw; }
-
-  .setup-row { display: flex; align-items: center; gap: 1.5vw; margin-bottom: 1.2vw; }
-  .setup-row:last-child { margin-bottom: 0; }
-  .setup-label { font-size: 1.8vw; font-weight: 600; color: var(--gold); min-width: 12vw; }
-  .setup-input {
-    flex: 1;
-    background: #0A1A50;
-    border: 1px solid #2A4A9A;
-    border-radius: 0.6vw;
-    padding: 0.7vw 1.2vw;
-    font-size: 2vw;
-    font-family: 'Cairo', sans-serif;
-    color: var(--white);
-    outline: none;
-  }
-  .setup-input:focus { border-color: var(--gold); }
-
-  .q-list { max-height: 28vh; overflow-y: auto; }
-  .q-item {
-    padding: 0.9vw 1.2vw; cursor: pointer;
-    font-size: 1.7vw; border-bottom: 0.5px solid #2A4A9A33;
-    transition: background 0.15s; border-radius: 0.4vw;
-  }
-  .q-item:hover { background: #1A3A8A55; }
-  .q-item.sel { background: #1A3A8A; color: var(--gold); font-weight: 700; }
-
-  .btn-start {
-    background: var(--gold);
-    color: var(--navy);
-    border: none; border-radius: 0.8vw;
-    padding: 1vw 4vw;
-    font-size: 2.5vw; font-weight: 900;
-    font-family: 'Cairo', sans-serif;
-    cursor: pointer;
-    transition: transform 0.1s, box-shadow 0.2s;
-    box-shadow: 0 0 30px #FFD70055;
-  }
-  .btn-start:hover { transform: scale(1.04); box-shadow: 0 0 50px #FFD70099; }
-  .btn-start:active { transform: scale(0.97); }
-
-  /* ─── GAME SCREEN ─── */
-  #game-screen { display: none; flex-direction: column; height: 100%; padding: 1.5vw 2vw; gap: 1.2vw; }
-
-  /* SCOREBOARD */
-  .scoreboard {
-    display: grid; grid-template-columns: 1fr auto 1fr;
-    align-items: center; gap: 1.5vw;
-    background: var(--navy-mid);
-    border: 1.5px solid #2A4A9A;
-    border-radius: 1vw;
-    padding: 1vw 2vw;
-  }
-  .team-block { display: flex; flex-direction: column; align-items: center; gap: 0.3vw; }
-  .team-block.right { align-items: flex-end; }
-  .team-block.left { align-items: flex-start; }
-  .team-lbl { font-size: 1.6vw; color: var(--text-muted); font-weight: 600; }
-  .team-score { font-size: 5vw; font-weight: 900; color: var(--white); line-height: 1; }
-  .team-block.active .team-lbl { color: var(--gold); }
-  .team-block.active .team-score { color: var(--gold); text-shadow: 0 0 20px #FFD70077; }
-
-  .logo-center { text-align: center; }
-  .logo-ar { font-size: 2.8vw; font-weight: 900; color: var(--gold); }
-  .logo-en { font-size: 1.1vw; color: var(--text-muted); letter-spacing: 0.15em; }
-  .turn-badge {
-    font-size: 1.2vw; color: var(--navy);
-    background: var(--gold); border-radius: 0.4vw;
-    padding: 0.2vw 0.8vw; margin-top: 0.4vw;
-    font-weight: 700;
-  }
-
-  /* STEAL BANNER */
-  .steal-banner {
-    background: #3A1500;
-    border: 2px solid var(--gold);
-    border-radius: 0.8vw;
-    padding: 1vw 2vw;
-    text-align: center;
-    font-size: 2.5vw; font-weight: 900;
-    color: var(--gold);
-    display: none;
-    animation: pulse 1s ease-in-out infinite alternate;
-  }
-  @keyframes pulse { from { opacity: 0.7; } to { opacity: 1; } }
-
-  /* QUESTION */
-  .question-box {
-    background: var(--navy-card);
-    border: 1.5px solid #2A4A9A;
-    border-radius: 1vw;
-    padding: 1.2vw 2.5vw;
-    text-align: center;
-  }
-  .q-label { font-size: 1.2vw; color: var(--text-muted); margin-bottom: 0.4vw; }
-  .q-text { font-size: 2.8vw; font-weight: 700; color: var(--white); line-height: 1.4; }
-  .q-pts-row { font-size: 1.4vw; color: var(--gold); margin-top: 0.4vw; }
-  .q-pts-num { font-weight: 900; font-size: 2vw; }
-
-  /* ANSWERS */
-  .answers-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1vw;
-    flex: 1;
-  }
-  .answer-card {
-    background: var(--navy-card);
-    border: 1.5px solid #2A4A9A;
-    border-radius: 0.8vw;
-    display: flex; align-items: center; gap: 1.2vw;
-    padding: 0 1.5vw;
-    cursor: pointer;
-    transition: background 0.15s, border-color 0.15s;
-    min-height: 0;
-    overflow: hidden;
-  }
-  .answer-card:hover:not(.rev) { background: #1A3A8A55; border-color: #4A7ACA; }
-  .answer-card.rev {
-    background: #061840;
-    border-color: var(--gold);
-    cursor: default;
-  }
-  .a-num {
-    width: 3.5vw; height: 3.5vw; border-radius: 50%;
-    background: #0A1A50; border: 1.5px solid #2A4A9A;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.8vw; font-weight: 700; color: var(--text-muted);
-    flex-shrink: 0;
-  }
-  .answer-card.rev .a-num { background: #8A6000; border-color: var(--gold); color: var(--gold); }
-  .a-body { flex: 1; text-align: right; }
-  .a-text-hidden { font-size: 2.5vw; color: #1A3A6A; letter-spacing: 0.4em; }
-  .a-text { font-size: 2.5vw; font-weight: 700; color: var(--white); }
-  .a-pts { font-size: 1.3vw; color: var(--gold); }
-  .a-bar-bg {
-    width: 5vw; height: 0.7vw; background: #0A1A50;
-    border-radius: 0.4vw; overflow: hidden; flex-shrink: 0;
-  }
-  .a-bar { height: 100%; background: var(--gold); border-radius: 0.4vw; transition: width 0.4s; }
-
-  /* STRIKES */
-  .strikes-row { display: flex; justify-content: center; align-items: center; gap: 1.5vw; }
-  .strike {
-    width: 4.5vw; height: 4.5vw; border-radius: 50%;
-    border: 2.5px solid #2A4A9A;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 2.5vw; color: #2A4A9A;
-    transition: all 0.2s;
-  }
-  .strike.hit {
-    border-color: var(--red-bright); color: var(--red-bright);
-    background: #2A0000;
-    box-shadow: 0 0 20px #FF222255;
-    animation: shake 0.3s;
-  }
-  @keyframes shake {
-    0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)}
-  }
-
-  /* CONTROLS */
-  .controls-row { display: flex; justify-content: center; gap: 1.2vw; flex-wrap: wrap; }
-  .ctrl-btn {
-    border: 1.5px solid #2A4A9A;
-    background: transparent;
-    border-radius: 0.7vw;
-    padding: 0.6vw 2vw;
-    font-size: 1.7vw; font-weight: 700;
-    font-family: 'Cairo', sans-serif;
-    color: var(--white);
-    cursor: pointer;
-    transition: background 0.15s, transform 0.1s;
-  }
-  .ctrl-btn:hover { background: #1A3A8A55; }
-  .ctrl-btn:active { transform: scale(0.96); }
-  .ctrl-btn.danger { border-color: var(--red-bright); color: var(--red-bright); }
-  .ctrl-btn.danger:hover { background: #2A000055; }
-  .ctrl-btn.success { border-color: #44CC44; color: #44CC44; }
-  .ctrl-btn.success:hover { background: #0A2A0A55; }
-  .ctrl-btn.gold { border-color: var(--gold); color: var(--gold); }
-  .ctrl-btn.gold:hover { background: #3A2A0055; }
-  .ctrl-btn.sm { font-size: 1.3vw; padding: 0.4vw 1.2vw; }
-
-  /* WIN SCREEN */
-  #win-screen {
-    display: none; flex-direction: column; align-items: center; justify-content: center;
-    height: 100%; gap: 2vw;
-  }
-  .win-emoji { font-size: 8vw; }
-  .win-title { font-size: 6vw; font-weight: 900; color: var(--gold); text-shadow: 0 0 60px #FFD700AA; }
-  .win-sub { font-size: 2.5vw; color: var(--text-muted); }
-  .win-scores { display: flex; gap: 4vw; margin-top: 1vw; }
-  .win-team { text-align: center; }
-  .win-team-name { font-size: 2vw; color: var(--text-muted); }
-  .win-team-score { font-size: 5vw; font-weight: 900; color: var(--white); }
-  .win-team.champion .win-team-name { color: var(--gold); }
-  .win-team.champion .win-team-score { color: var(--gold); text-shadow: 0 0 30px #FFD70077; }
+/* HOST CONTROLS */
+.host-ans{display:flex;align-items:center;gap:1vw;background:#0A1840;border:1px solid #2A4A9A;padding:.65vh 1.2vw;margin-bottom:5px;cursor:pointer}
+.hbtn{background:transparent;border:1.5px solid #2A4A9A;padding:.55vh 1.3vw;color:white;cursor:pointer;font-family:'Cairo'}
+.hbtn.danger{border-color:var(--red);color:var(--red)}
+.hbtn.success{border-color:var(--green);color:var(--green)}
 </style>
 </head>
 <body>
+
 <div id="app">
-
-  <!-- ══════════ SETUP ══════════ -->
-  <div id="setup-screen">
-    <div style="text-align:center">
-      <div class="setup-title">فاملي فيود</div>
-      <div class="setup-sub">Family Feud — النسخة العربية</div>
+  <div id="landing" class="screen">
+    <div class="land-title">فاملي فيود 🎯</div>
+    <div class="land-cards">
+      <div class="land-card" onclick="goHost()">🎮 شاشة المقدّم</div>
+      <div class="land-card" onclick="goDisplay()">📺 شاشة العرض</div>
     </div>
-
-    <div class="setup-card">
-      <div class="setup-card-title">أسماء الفريقين</div>
-      <div class="setup-row">
-        <span class="setup-label">الفريق 1</span>
-        <input class="setup-input" id="t1name" value="الفريق الأول" />
-      </div>
-      <div class="setup-row">
-        <span class="setup-label">الفريق 2</span>
-        <input class="setup-input" id="t2name" value="الفريق الثاني" />
-      </div>
-    </div>
-
-    <div class="setup-card">
-      <div class="setup-card-title">اختر السؤال</div>
-      <div class="q-list" id="qlist"></div>
-    </div>
-
-    <button class="btn-start" onclick="startGame()">ابدأ اللعبة ◄</button>
   </div>
 
-  <!-- ══════════ GAME ══════════ -->
-  <div id="game-screen">
+  <div id="host" class="screen hidden" style="padding:20px; overflow-y:auto;">
+    <h2 id="h-qtxt" style="color:var(--gold); margin-bottom:10px;">السؤال يظهر هنا</h2>
+    <div id="h-anslist"></div>
+    <hr style="margin:20px 0; opacity:0.2">
+    <div style="display:flex; gap:10px; justify-content:center;">
+        <button class="hbtn danger" onclick="addStrike()">✕ خطأ</button>
+        <button class="hbtn success" onclick="awardPoints()">✔ منح النقاط</button>
+        <button class="hbtn" onclick="nextRound()">الجولة التالية ◄</button>
+    </div>
+  </div>
 
+  <div id="display" class="screen hidden" style="padding:20px;">
     <div class="scoreboard">
-      <div class="team-block right" id="tb1">
-        <div class="team-lbl" id="tn1">الفريق الأول</div>
-        <div class="team-score" id="sc1">0</div>
-      </div>
-      <div class="logo-center">
-        <div class="logo-ar">فاملي فيود</div>
-        <div class="logo-en">FAMILY FEUD</div>
-        <div class="turn-badge" id="turn-badge">دور الفريق الأول</div>
-      </div>
-      <div class="team-block left" id="tb2">
-        <div class="team-lbl" id="tn2">الفريق الثاني</div>
-        <div class="team-score" id="sc2">0</div>
-      </div>
+        <div class="t-block" id="d-tb1"><div id="d-tn1">فريق 1</div><div class="t-score" id="d-sc1">0</div></div>
+        <div style="text-align:center"><div style="color:var(--gold); font-weight:900">FAMILY FEUD</div><div id="d-rpts" style="font-size:24px">0</div></div>
+        <div class="t-block" id="d-tb2"><div id="d-tn2">فريق 2</div><div class="t-score" id="d-sc2">0</div></div>
     </div>
-
-    <div class="steal-banner" id="steal-banner">⚡ سرقة! — هل يريد الفريق الآخر الإجابة؟ ⚡</div>
-
-    <div class="question-box">
-      <div class="q-label">السؤال</div>
-      <div class="q-text" id="q-text"></div>
-      <div class="q-pts-row">النقاط المجمّعة: <span class="q-pts-num" id="round-pts">0</span></div>
-    </div>
-
-    <div class="answers-grid" id="answers-grid"></div>
-
-    <div class="strikes-row">
-      <div class="strike" id="s0">✕</div>
-      <div class="strike" id="s1">✕</div>
-      <div class="strike" id="s2">✕</div>
-    </div>
-
-    <div class="controls-row">
-      <button class="ctrl-btn danger" onclick="addStrike()">✕ &nbsp; خطأ</button>
-      <button class="ctrl-btn success" onclick="awardPoints()">✔ &nbsp; منح النقاط</button>
-      <button class="ctrl-btn gold" onclick="doSteal()">⚡ سرقة</button>
-      <button class="ctrl-btn" onclick="revealAll()">كشف الكل</button>
-      <button class="ctrl-btn sm" onclick="nextRound()">التالي ◄</button>
-      <button class="ctrl-btn sm" onclick="goSetup()">↩ إعداد</button>
-    </div>
-
+    <div id="d-qtxt" style="font-size:30px; text-align:center; margin:20px 0;">السؤال؟</div>
+    <div class="ans-grid" id="d-ansgrid"></div>
   </div>
-
-  <!-- ══════════ WIN ══════════ -->
-  <div id="win-screen">
-    <div class="win-emoji">🏆</div>
-    <div class="win-title" id="win-title">الفريق الأول يفوز!</div>
-    <div class="win-sub">نهاية اللعبة</div>
-    <div class="win-scores">
-      <div class="win-team" id="wt1">
-        <div class="win-team-name" id="wtn1">الفريق الأول</div>
-        <div class="win-team-score" id="wsc1">0</div>
-      </div>
-      <div style="font-size:5vw;color:#2A4A9A;align-self:center">vs</div>
-      <div class="win-team" id="wt2">
-        <div class="win-team-name" id="wtn2">الفريق الثاني</div>
-        <div class="win-team-score" id="wsc2">0</div>
-      </div>
-    </div>
-    <button class="btn-start" style="margin-top:1vw" onclick="goSetup()">العب مجدداً</button>
-  </div>
-
 </div>
 
 <script>
-const QUESTIONS = [
-  { q: "سمّ شيئاً يضعه الناس في قهوتهم", answers: [
-    { t:"سكر", p:35 }, { t:"حليب / كريمة", p:28 }, { t:"هيل", p:15 },
-    { t:"قرفة", p:10 }, { t:"زعفران", p:7 }, { t:"ملح", p:5 }
-  ]},
-  { q: "سمّ شيئاً تجده في غرفة النوم", answers: [
-    { t:"سرير", p:40 }, { t:"خزانة", p:22 }, { t:"تلفاز", p:18 },
-    { t:"وسادة", p:10 }, { t:"مكيف", p:7 }, { t:"كتب", p:3 }
-  ]},
-  { q: "شيء تفعله قبل النوم مباشرةً", answers: [
-    { t:"تفرش أسنانك", p:32 }, { t:"تستحم", p:24 }, { t:"تشيّك الموبايل", p:20 },
-    { t:"تشرب ماء", p:12 }, { t:"تقرأ", p:8 }, { t:"تصلّي", p:4 }
-  ]},
-  { q: "سمّ وجبة عائلية سعودية مشهورة", answers: [
-    { t:"كبسة", p:38 }, { t:"مندي", p:25 }, { t:"جريش", p:15 },
-    { t:"مرق", p:10 }, { t:"مظبي", p:8 }, { t:"هريس", p:4 }
-  ]},
-  { q: "سمّ مكاناً تحب العائلة الخروج إليه", answers: [
-    { t:"مطعم", p:30 }, { t:"بحر / شاطئ", p:25 }, { t:"مول", p:20 },
-    { t:"حديقة", p:12 }, { t:"مدينة ملاهي", p:8 }, { t:"نادي رياضي", p:5 }
-  ]},
-  { q: "ذكر شيئاً تشتريه في رمضان أكثر من غيره", answers: [
-    { t:"تمر", p:34 }, { t:"عصائر وعروق", p:26 }, { t:"بخور وعطور", p:16 },
-    { t:"ملابس", p:12 }, { t:"حلويات", p:8 }, { t:"قهوة", p:4 }
-  ]},
-  { q: "سمّ شيئاً يجعل الطفل يبكي", answers: [
-    { t:"الجوع", p:35 }, { t:"النوم", p:25 }, { t:"أخذ لعبته", p:18 },
-    { t:"الخوف", p:12 }, { t:"الألم", p:7 }, { t:"الملل", p:3 }
-  ]},
-  { q: "شيء لا تنساه عند الخروج من البيت", answers: [
-    { t:"الجوال", p:42 }, { t:"المفاتيح", p:28 }, { t:"المحفظة", p:16 },
-    { t:"العطر", p:8 }, { t:"الشحّان", p:4 }, { t:"النظارة", p:2 }
-  ]}
-];
+// الأصوات (روابط مباشرة لمؤثرات صوتية عامة)
+const soundCorrect = new Audio('https://www.soundjay.com/buttons/sounds/button-37.mp3');
+const soundError = new Audio('https://www.soundjay.com/buttons/sounds/button-10.mp3');
 
-let S = {
-  t1:"الفريق الأول", t2:"الفريق الثاني",
-  s1:0, s2:0,
-  qi:0, rev:[], strikes:0, cur:1, rp:0, stealing:false
+let G = {
+  t1: "الفريق الأول", t2: "الفريق الثاني",
+  s1: 0, s2: 0, qi: 0, strikes: 0, rp: 0, cur: 1,
+  rev: [], 
+  questions: [
+    {q: "نادي سعودي حقق دوري أبطال آسيا", a: [{t: "الهلال", p: 45}, {t: "الاتحاد", p: 35}, {t: "النصر", p: 15}, {t: "السد (قديم)", p: 5}]},
+    {q: "شيء يطلبه العميل من فني الصيانة دائماً", a: [{t: "تخفيض السعر", p: 40}, {t: "سرعة الإنجاز", p: 30}, {t: "ضمان العمل", p: 20}, {t: "قطع غيار أصلية", p: 10}]},
+    {q: "لاعب سعودي سجل في كأس العالم", a: [{t: "سالم الدوسري", p: 38}, {t: "سامي الجابر", p: 30}, {t: "سعيد العويران", p: 20}, {t: "فؤاد أنور", p: 12}]},
+    {q: "أكثر شيء يضيع في البيت", a: [{t: "ريموت التلفزيون", p: 42}, {t: "المفاتيح", p: 28}, {t: "الشاحن", p: 18}, {t: "فرشة الشعر", p: 12}]}
+  ]
 };
-let selQ = 0;
 
-function renderQList() {
-  document.getElementById('qlist').innerHTML = QUESTIONS.map((q,i) =>
-    `<div class="q-item${i===selQ?' sel':''}" onclick="pickQ(${i})">${i+1}. ${q.q}</div>`
-  ).join('');
-}
-function pickQ(i) { selQ = i; renderQList(); }
+function save() { localStorage.setItem('ff_game', JSON.stringify(G)); }
+function load() { const d = localStorage.getItem('ff_game'); if(d) G = JSON.parse(d); }
 
-function startGame() {
-  S.t1 = document.getElementById('t1name').value || 'الفريق الأول';
-  S.t2 = document.getElementById('t2name').value || 'الفريق الثاني';
-  S.qi = selQ; S.s1 = 0; S.s2 = 0;
-  S.rev = new Array(QUESTIONS[S.qi].answers.length).fill(false);
-  S.strikes = 0; S.cur = 1; S.rp = 0; S.stealing = false;
-  show('game-screen');
-  render();
+function goHost() { 
+    isHost = true; 
+    G.rev = new Array(G.questions[G.qi].a.length).fill(false);
+    document.getElementById('landing').classList.add('hidden');
+    document.getElementById('host').classList.remove('hidden');
+    renderHost();
 }
 
-function show(id) {
-  ['setup-screen','game-screen','win-screen'].forEach(s => {
-    const el = document.getElementById(s);
-    el.style.display = (s === id) ? 'flex' : 'none';
-  });
+function goDisplay() { 
+    isDisplay = true;
+    document.getElementById('landing').classList.add('hidden');
+    document.getElementById('display').classList.remove('hidden');
+    setInterval(() => { load(); renderDisplay(); }, 500); 
 }
 
-function render() {
-  const q = QUESTIONS[S.qi];
-  document.getElementById('tn1').textContent = S.t1;
-  document.getElementById('tn2').textContent = S.t2;
-  document.getElementById('sc1').textContent = S.s1;
-  document.getElementById('sc2').textContent = S.s2;
-  document.getElementById('q-text').textContent = q.q;
-  document.getElementById('round-pts').textContent = S.rp;
-  document.getElementById('turn-badge').textContent = 'دور: ' + (S.cur===1?S.t1:S.t2);
-
-  document.getElementById('tb1').className = 'team-block right' + (S.cur===1?' active':'');
-  document.getElementById('tb2').className = 'team-block left' + (S.cur===2?' active':'');
-
-  for(let i=0;i<3;i++) {
-    const el = document.getElementById('s'+i);
-    el.classList.toggle('hit', i < S.strikes);
-  }
-
-  document.getElementById('steal-banner').style.display = S.stealing ? '' : 'none';
-
-  const grid = document.getElementById('answers-grid');
-  grid.innerHTML = q.answers.map((a,i) => {
-    const r = S.rev[i];
-    return `<div class="answer-card${r?' rev':''}" onclick="revealAns(${i})">
-      <div class="a-num">${i+1}</div>
-      <div class="a-body">
-        ${r ? `<div class="a-text">${a.t}</div><div class="a-pts">${a.p} نقطة</div>` : `<div class="a-text-hidden">■ ■ ■ ■</div>`}
-      </div>
-      <div class="a-bar-bg"><div class="a-bar" style="width:${r?a.p:0}%"></div></div>
-    </div>`;
-  }).join('');
+function renderHost() {
+    const q = G.questions[G.qi];
+    document.getElementById('h-qtxt').innerText = q.q;
+    document.getElementById('h-anslist').innerHTML = q.a.map((ans, i) => `
+        <div class="host-ans ${G.rev[i]?'rev':''}" onclick="reveal(${i})">
+            ${ans.t} (${ans.p} نقطة) ${G.rev[i]?'✅':''}
+        </div>
+    `).join('');
 }
 
-function revealAns(i) {
-  if(S.rev[i]) return;
-  S.rev[i] = true;
-  S.rp += QUESTIONS[S.qi].answers[i].p;
-  render();
-}
-
-function revealAll() {
-  S.rev = S.rev.map(()=>true);
-  S.rp = QUESTIONS[S.qi].answers.reduce((s,a)=>s+a.p,0);
-  render();
+function reveal(i) {
+    if(G.rev[i]) return;
+    G.rev[i] = true;
+    G.rp += G.questions[G.qi].a[i].p;
+    soundCorrect.play();
+    save();
+    renderHost();
 }
 
 function addStrike() {
-  if(S.strikes >= 3) return;
-  S.strikes++;
-  render();
-  if(S.strikes >= 3) { S.stealing = true; render(); }
-}
-
-function doSteal() {
-  S.stealing = true;
-  S.cur = S.cur === 1 ? 2 : 1;
-  render();
+    G.strikes++;
+    soundError.play();
+    if(G.strikes >= 3) alert("سرقة للنقاط!");
+    save();
 }
 
 function awardPoints() {
-  if(S.cur===1) S.s1 += S.rp;
-  else S.s2 += S.rp;
-  render();
-  setTimeout(nextRound, 600);
+    if(G.cur === 1) G.s1 += G.rp; else G.s2 += G.rp;
+    G.rp = 0;
+    save();
 }
 
 function nextRound() {
-  S.qi = (S.qi + 1) % QUESTIONS.length;
-  S.rev = new Array(QUESTIONS[S.qi].answers.length).fill(false);
-  S.strikes = 0; S.rp = 0; S.stealing = false;
-  S.cur = S.cur === 1 ? 2 : 1;
-  render();
+    G.qi = (G.qi + 1) % G.questions.length;
+    G.rev = new Array(G.questions[G.qi].a.length).fill(false);
+    G.strikes = 0; G.rp = 0; G.cur = G.cur === 1 ? 2 : 1;
+    save();
+    renderHost();
 }
 
-function goSetup() {
-  show('setup-screen');
-  renderQList();
+function renderDisplay() {
+    const q = G.questions[G.qi];
+    document.getElementById('d-qtxt').innerText = q.q;
+    document.getElementById('d-sc1').innerText = G.s1;
+    document.getElementById('d-sc2').innerText = G.s2;
+    document.getElementById('d-rpts').innerText = G.rp;
+    document.getElementById('d-ansgrid').innerHTML = q.a.map((ans, i) => `
+        <div class="ans-card ${G.rev[i]?'rev':''}">
+            ${G.rev[i] ? ans.t + ' - ' + ans.p : '???'}
+        </div>
+    `).join('');
 }
-
-function showWinner() {
-  document.getElementById('wtn1').textContent = S.t1;
-  document.getElementById('wtn2').textContent = S.t2;
-  document.getElementById('wsc1').textContent = S.s1;
-  document.getElementById('wsc2').textContent = S.s2;
-  const t1win = S.s1 >= S.s2;
-  document.getElementById('wt1').className = 'win-team' + (t1win?' champion':'');
-  document.getElementById('wt2').className = 'win-team' + (!t1win?' champion':'');
-  document.getElementById('win-title').textContent = (t1win?S.t1:S.t2) + ' يفوز! 🏆';
-  show('win-screen');
-}
-
-renderQList();
 </script>
 </body>
 </html>
